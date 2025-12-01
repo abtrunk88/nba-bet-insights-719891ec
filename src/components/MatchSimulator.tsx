@@ -27,10 +27,27 @@ export function MatchSimulator({
   homeTeamName,
   awayTeamName,
 }: MatchSimulatorProps) {
-  const [homeAbsentNames, setHomeAbsentNames] = useState<string[]>([]);
-  const [awayAbsentNames, setAwayAbsentNames] = useState<string[]>([]);
+  const [homeAbsentIndices, setHomeAbsentIndices] = useState<number[]>([]);
+  const [awayAbsentIndices, setAwayAbsentIndices] = useState<number[]>([]);
 
-  const { data: prediction, isLoading } = useQuery({
+  // Initial fetch without absent players
+  const { data: initialPrediction, isLoading: initialLoading } = useQuery({
+    queryKey: ["interactive-match-prediction-initial", homeTeamId, awayTeamId],
+    queryFn: () =>
+      nbaApi.getFullMatchPredictionWithAbsents(homeTeamId, awayTeamId),
+  });
+
+  // Build list of player IDs from current state and initial data
+  const homeAbsentIds = homeAbsentIndices
+    .map((idx) => initialPrediction?.home_players[idx]?.player_id)
+    .filter((id) => id !== undefined && id > 0) as number[];
+
+  const awayAbsentIds = awayAbsentIndices
+    .map((idx) => initialPrediction?.away_players[idx]?.player_id)
+    .filter((id) => id !== undefined && id > 0) as number[];
+
+  // Fetch with absent players
+  const { data: prediction, isLoading: predictionLoading } = useQuery({
     queryKey: ["interactive-match-prediction", homeTeamId, awayTeamId, homeAbsentIds.join(","), awayAbsentIds.join(",")],
     queryFn: () =>
       nbaApi.getFullMatchPredictionWithAbsents(
@@ -39,21 +56,26 @@ export function MatchSimulator({
         homeAbsentIds.length > 0 ? homeAbsentIds : undefined,
         awayAbsentIds.length > 0 ? awayAbsentIds : undefined
       ),
+    enabled: homeAbsentIds.length > 0 || awayAbsentIds.length > 0,
   });
 
+  // Use the recalculated prediction if available, otherwise use initial
+  const displayPrediction = (homeAbsentIds.length > 0 || awayAbsentIds.length > 0) ? prediction : initialPrediction;
+  const isLoading = initialLoading || predictionLoading;
+
   const toggleHomePlayerAbsent = useCallback(
-    (playerId: number) => {
-      setHomeAbsentIds((prev) =>
-        prev.includes(playerId) ? prev.filter((id) => id !== playerId) : [...prev, playerId]
+    (playerIndex: number) => {
+      setHomeAbsentIndices((prev) =>
+        prev.includes(playerIndex) ? prev.filter((idx) => idx !== playerIndex) : [...prev, playerIndex]
       );
     },
     []
   );
 
   const toggleAwayPlayerAbsent = useCallback(
-    (playerId: number) => {
-      setAwayAbsentIds((prev) =>
-        prev.includes(playerId) ? prev.filter((id) => id !== playerId) : [...prev, playerId]
+    (playerIndex: number) => {
+      setAwayAbsentIndices((prev) =>
+        prev.includes(playerIndex) ? prev.filter((idx) => idx !== playerIndex) : [...prev, playerIndex]
       );
     },
     []
