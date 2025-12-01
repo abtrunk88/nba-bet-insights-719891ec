@@ -169,20 +169,14 @@ const GameDetails = () => {
           </Alert>
         )}
 
-        {/* Players Tables */}
-        {matchPrediction && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <MatchDetailsTable
-              teamName={currentGame.awayTeam}
-              players={matchPrediction.away_players}
-              isHomeTeam={false}
-            />
-            <MatchDetailsTable
-              teamName={currentGame.homeTeam}
-              players={matchPrediction.home_players}
-              isHomeTeam={true}
-            />
-          </div>
+        {/* Interactive Match Simulator */}
+        {homeTeamId && awayTeamId && (
+          <MatchSimulator
+            homeTeamId={homeTeamId}
+            awayTeamId={awayTeamId}
+            homeTeamName={currentGame.homeTeam}
+            awayTeamName={currentGame.awayTeam}
+          />
         )}
       </main>
 
