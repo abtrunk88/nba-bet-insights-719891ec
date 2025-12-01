@@ -48,6 +48,8 @@ export interface TodayGame {
   gameId: string;
   homeTeam: string;
   awayTeam: string;
+  homeTeamId?: string;
+  awayTeamId?: string;
   time: string;
   homeScore?: number;
   awayScore?: number;
@@ -126,6 +128,44 @@ export interface MissingPlayerAnalysis {
   team: string;
   stats_with: PlayerStats;
   stats_without: PlayerStats;
+}
+
+export interface PlayerPredictedStats {
+  PTS: number;
+  REB: number;
+  AST: number;
+  MIN: number;
+  FG3M: number;
+}
+
+export interface AdvancedMetricsProjected {
+  PRA: number;
+}
+
+export interface BlowoutAnalysis {
+  risk_level: "LOW" | "HIGH" | "MEDIUM";
+}
+
+export interface MatchupAnalysis {
+  paint_vulnerability?: number;
+  [key: string]: any;
+}
+
+export interface PlayerFullPrediction {
+  player: string;
+  position?: string;
+  predicted_stats: PlayerPredictedStats;
+  advanced_metrics_projected: AdvancedMetricsProjected;
+  matchup_analysis?: MatchupAnalysis;
+  blowout_analysis: BlowoutAnalysis;
+}
+
+export interface FullMatchPrediction {
+  home_players: PlayerFullPrediction[];
+  away_players: PlayerFullPrediction[];
+  blowout_analysis?: {
+    risk_level: "LOW" | "HIGH" | "MEDIUM";
+  };
 }
 
 export const nbaApi = {
@@ -208,6 +248,15 @@ export const nbaApi = {
   ): Promise<MissingPlayerAnalysis> {
     const response = await fetch(`${API_BASE_URL}/analytics/team/${teamCode}/missing-player/${playerId}`);
     if (!response.ok) throw new Error("Failed to analyze missing player impact");
+    return response.json();
+  },
+
+  async getFullMatchPrediction(
+    homeTeamId: string,
+    awayTeamId: string
+  ): Promise<FullMatchPrediction> {
+    const response = await fetch(`${API_BASE_URL}/predict/full-match/${homeTeamId}/${awayTeamId}`);
+    if (!response.ok) throw new Error("Failed to fetch full match prediction");
     return response.json();
   },
 };

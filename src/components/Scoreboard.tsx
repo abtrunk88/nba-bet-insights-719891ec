@@ -4,9 +4,11 @@ import { nbaApi, TodayGame } from "@/services/nbaApi";
 import { Calendar, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MatchPredictionModal } from "./MatchPredictionModal";
 
 export function Scoreboard() {
+  const navigate = useNavigate();
   const [selectedGame, setSelectedGame] = useState<TodayGame | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -19,6 +21,10 @@ export function Scoreboard() {
   const handleAnalyzeClick = (game: TodayGame) => {
     setSelectedGame(game);
     setModalOpen(true);
+  };
+
+  const handleGameCardClick = (game: TodayGame) => {
+    navigate(`/game/${game.gameId}`);
   };
 
   if (isLoading) {
@@ -81,7 +87,8 @@ export function Scoreboard() {
               {dateGames.map((game) => (
                 <div
                   key={game.gameId}
-                  className="bg-secondary/50 p-4 rounded-lg border border-border hover:border-primary/50 transition-colors relative flex flex-col"
+                  onClick={() => handleGameCardClick(game)}
+                  className="bg-secondary/50 p-4 rounded-lg border border-border hover:border-primary/50 transition-all hover:shadow-lg cursor-pointer relative flex flex-col"
                 >
                   {game.isLive && (
                     <div className="absolute top-2 right-2 flex items-center gap-1">
@@ -119,7 +126,10 @@ export function Scoreboard() {
                       size="sm"
                       variant="outline"
                       className="w-full text-xs h-8 gap-1.5 hover:bg-purple-500/20 hover:border-purple-500/50"
-                      onClick={() => handleAnalyzeClick(game)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAnalyzeClick(game);
+                      }}
                     >
                       <Brain className="h-3.5 w-3.5" />
                       Analyser
