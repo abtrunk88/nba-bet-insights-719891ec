@@ -70,6 +70,11 @@ export interface VsTeamStats {
   OPPONENT?: string;
 }
 
+export interface AbsencesImpact {
+  home_penalty: number;
+  away_penalty: number;
+}
+
 export interface MatchPrediction {
   home_team: string;
   away_team: string;
@@ -83,6 +88,7 @@ export interface MatchPrediction {
     away_net_rtg: number;
     spread_raw: number;
   };
+  absences_impact?: AbsencesImpact;
 }
 
 export interface PlayerProjection {
