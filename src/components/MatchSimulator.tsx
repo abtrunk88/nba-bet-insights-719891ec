@@ -61,7 +61,8 @@ export function MatchSimulator({
 
   // Use the recalculated prediction if available, otherwise use initial
   const displayPrediction = (homeAbsentIds.length > 0 || awayAbsentIds.length > 0) ? prediction : initialPrediction;
-  const isLoading = initialLoading || predictionLoading;
+  const isRecalculating = predictionLoading && (homeAbsentIds.length > 0 || awayAbsentIds.length > 0);
+  const isLoading = initialLoading || isRecalculating;
 
   const toggleHomePlayerAbsent = useCallback(
     (playerIndex: number) => {
