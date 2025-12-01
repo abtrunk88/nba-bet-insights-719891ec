@@ -82,12 +82,12 @@ export function MatchSimulator({
   );
 
   const hasHighBlowoutRisk = useMemo(() => {
-    if (!prediction) return false;
-    const allPlayers = [...prediction.home_players, ...prediction.away_players];
+    if (!displayPrediction) return false;
+    const allPlayers = [...displayPrediction.home_players, ...displayPrediction.away_players];
     return allPlayers.some((p) => p.blowout_analysis.risk_level === "HIGH");
-  }, [prediction]);
+  }, [displayPrediction]);
 
-  if (!prediction) {
+  if (!displayPrediction) {
     return (
       <div className="text-center py-8 text-muted-foreground">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
