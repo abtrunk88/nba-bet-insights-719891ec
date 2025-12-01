@@ -151,13 +151,26 @@ export interface MatchupAnalysis {
   [key: string]: any;
 }
 
+export interface PlayerContext {
+  boost_applied: string;
+  blowout_penalty: string;
+  form_weight: string;
+}
+
 export interface PlayerFullPrediction {
   player: string;
   position?: string;
+  player_id?: number;
   predicted_stats: PlayerPredictedStats;
   advanced_metrics_projected: AdvancedMetricsProjected;
   matchup_analysis?: MatchupAnalysis;
+  context?: PlayerContext;
   blowout_analysis: BlowoutAnalysis;
+}
+
+export interface MatchContext {
+  home_usage_boost: number;
+  away_usage_boost: number;
 }
 
 export interface FullMatchPrediction {
@@ -166,6 +179,12 @@ export interface FullMatchPrediction {
   blowout_analysis?: {
     risk_level: "LOW" | "HIGH" | "MEDIUM";
   };
+}
+
+export interface InteractiveMatchPrediction {
+  match_context: MatchContext;
+  home_players: PlayerFullPrediction[];
+  away_players: PlayerFullPrediction[];
 }
 
 export const nbaApi = {
