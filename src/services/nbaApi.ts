@@ -64,6 +64,8 @@ export interface VsTeamStats {
   PRA: number;
   PA: number;
   PR: number;
+  STL: number;
+  BLK: number;
   OPPONENT: string;
 }
 

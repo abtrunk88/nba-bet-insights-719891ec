@@ -252,6 +252,7 @@ export function PlayerDashboard({ player }: PlayerDashboardProps) {
                 </div>
               ) : vsTeamStats && typeof vsTeamStats === 'object' && vsTeamStats.GP && vsTeamStats.GP > 0 ? (
                 <div className="space-y-6">
+                  <pre className="bg-gray-800 p-2 text-xs text-green-400 mt-4 rounded overflow-auto">{JSON.stringify(vsTeamStats, null, 2)}</pre>
                   <div className="text-center mb-6">
                     <h3 className="text-2xl font-display font-bold text-foreground">
                       Moyennes contre {vsTeamStats.OPPONENT}
