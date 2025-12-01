@@ -250,4 +250,13 @@ export const nbaApi = {
     if (!response.ok) throw new Error("Failed to analyze missing player impact");
     return response.json();
   },
+
+  async getFullMatchPrediction(
+    homeTeamId: string,
+    awayTeamId: string
+  ): Promise<FullMatchPrediction> {
+    const response = await fetch(`${API_BASE_URL}/predict/full-match/${homeTeamId}/${awayTeamId}`);
+    if (!response.ok) throw new Error("Failed to fetch full match prediction");
+    return response.json();
+  },
 };
