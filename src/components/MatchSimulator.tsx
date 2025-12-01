@@ -38,17 +38,27 @@ export function MatchSimulator({
   });
 
   // Build list of player IDs from current state and initial data
-  const homeAbsentIds = homeAbsentIndices
-    .map((idx) => initialPrediction?.home_players[idx]?.player_id)
-    .filter((id) => id !== undefined) as number[];
+  const homeAbsentIds = useMemo(() => {
+    return homeAbsentIndices
+      .map((idx) => initialPrediction?.home_players[idx]?.player_id)
+      .filter((id) => id !== undefined) as number[];
+  }, [homeAbsentIndices, initialPrediction]);
 
-  const awayAbsentIds = awayAbsentIndices
-    .map((idx) => initialPrediction?.away_players[idx]?.player_id)
-    .filter((id) => id !== undefined) as number[];
+  const awayAbsentIds = useMemo(() => {
+    return awayAbsentIndices
+      .map((idx) => initialPrediction?.away_players[idx]?.player_id)
+      .filter((id) => id !== undefined) as number[];
+  }, [awayAbsentIndices, initialPrediction]);
 
-  // Fetch with absent players (only if we have absent IDs and initial data is loaded)
-  const { data: prediction, isLoading: predictionLoading } = useQuery({
-    queryKey: ["interactive-match-prediction", homeTeamId, awayTeamId, homeAbsentIds.join(","), awayAbsentIds.join(",")],
+  // Fetch with absent players (triggers immediately when absent IDs change)
+  const { data: prediction, isLoading: predictionLoading, isFetching: isPredictionFetching } = useQuery({
+    queryKey: [
+      "interactive-match-prediction",
+      homeTeamId,
+      awayTeamId,
+      homeAbsentIds.length > 0 ? homeAbsentIds.join(",") : "none",
+      awayAbsentIds.length > 0 ? awayAbsentIds.join(",") : "none",
+    ],
     queryFn: () =>
       nbaApi.getFullMatchPredictionWithAbsents(
         homeTeamId,
@@ -56,18 +66,28 @@ export function MatchSimulator({
         homeAbsentIds.length > 0 ? homeAbsentIds : undefined,
         awayAbsentIds.length > 0 ? awayAbsentIds : undefined
       ),
-    enabled: !initialLoading && (homeAbsentIds.length > 0 || awayAbsentIds.length > 0),
+    enabled: !initialLoading && initialPrediction !== undefined,
   });
 
-  // Use the recalculated prediction if available, otherwise use initial
-  const displayPrediction = (homeAbsentIds.length > 0 || awayAbsentIds.length > 0) ? prediction : initialPrediction;
-  const isRecalculating = predictionLoading && (homeAbsentIds.length > 0 || awayAbsentIds.length > 0);
-  const isLoading = initialLoading || isRecalculating;
+  // Use the prediction with absent players if we have any, otherwise use initial
+  const displayPrediction =
+    (homeAbsentIds.length > 0 || awayAbsentIds.length > 0) && prediction
+      ? prediction
+      : initialPrediction;
+
+  // Show loading indicator only during recalculation (not on initial load)
+  const isRecalculating =
+    isPredictionFetching &&
+    (homeAbsentIds.length > 0 || awayAbsentIds.length > 0);
+
+  const isLoading = initialLoading;
 
   const toggleHomePlayerAbsent = useCallback(
     (playerIndex: number) => {
       setHomeAbsentIndices((prev) =>
-        prev.includes(playerIndex) ? prev.filter((idx) => idx !== playerIndex) : [...prev, playerIndex]
+        prev.includes(playerIndex)
+          ? prev.filter((idx) => idx !== playerIndex)
+          : [...prev, playerIndex]
       );
     },
     []
@@ -76,7 +96,9 @@ export function MatchSimulator({
   const toggleAwayPlayerAbsent = useCallback(
     (playerIndex: number) => {
       setAwayAbsentIndices((prev) =>
-        prev.includes(playerIndex) ? prev.filter((idx) => idx !== playerIndex) : [...prev, playerIndex]
+        prev.includes(playerIndex)
+          ? prev.filter((idx) => idx !== playerIndex)
+          : [...prev, playerIndex]
       );
     },
     []
