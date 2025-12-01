@@ -229,21 +229,23 @@ export function MatchSimulator({
               </TableHeader>
               <TableBody>
                 {prediction.away_players.map((player, idx) => {
-                  const isAbsent = awayAbsentPlayers.includes(player.player);
+                  const isAbsent = player.player_id ? awayAbsentIds.includes(player.player_id) : false;
                   const boostValue = prediction.match_context.away_usage_boost;
                   const boostApplied = player.context?.boost_applied || "";
 
                   return (
                     <TableRow
-                      key={`away-${idx}-${player.player}`}
+                      key={player.player_id ? `away-${player.player_id}` : `away-${idx}`}
                       className={isAbsent ? "bg-muted/50 opacity-60" : ""}
                     >
                       <TableCell className="w-10">
-                        <Checkbox
-                          checked={isAbsent}
-                          onCheckedChange={() => toggleAwayPlayerAbsent(player.player)}
-                          disabled={isLoading}
-                        />
+                        {player.player_id && (
+                          <Checkbox
+                            checked={isAbsent}
+                            onCheckedChange={() => toggleAwayPlayerAbsent(player.player_id!)}
+                            disabled={isLoading}
+                          />
+                        )}
                       </TableCell>
                       <TableCell className="font-medium">
                         {player.player}
