@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { nbaApi, TodayGame } from "@/services/nbaApi";
-import { MatchDetailsTable } from "@/components/MatchDetailsTable";
+import { MatchSimulator } from "@/components/MatchSimulator";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -21,17 +21,7 @@ const GameDetails = () => {
   const homeTeamId = currentGame?.homeTeamId || (currentGame ? getTeamCode(currentGame.homeTeam) : "");
   const awayTeamId = currentGame?.awayTeamId || (currentGame ? getTeamCode(currentGame.awayTeam) : "");
 
-  const {
-    data: matchPrediction,
-    isLoading: predictionLoading,
-    error: predictionError,
-  } = useQuery({
-    queryKey: ["full-match-prediction", homeTeamId, awayTeamId],
-    queryFn: () => nbaApi.getFullMatchPrediction(homeTeamId, awayTeamId),
-    enabled: !!homeTeamId && !!awayTeamId && !gamesLoading,
-  });
-
-  const isLoading = gamesLoading || predictionLoading;
+  const isLoading = gamesLoading;
 
   if (isLoading) {
     return (
@@ -100,9 +90,6 @@ const GameDetails = () => {
     );
   }
 
-  const blowoutRiskLevel = matchPrediction?.blowout_analysis?.risk_level || "LOW";
-  const hasHighBlowoutRisk = blowoutRiskLevel === "HIGH";
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -148,41 +135,17 @@ const GameDetails = () => {
             )}
           </div>
 
-          {/* Blowout Warning */}
-          {hasHighBlowoutRisk && (
-            <Alert className="border-l-4 border-l-amber-500 bg-amber-500/10 mb-6">
-              <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
-              <AlertDescription className="text-amber-900 dark:text-amber-200">
-                ⚠️ Risque de Blowout élevé : Temps de jeu des stars potentiellement réduit.
-              </AlertDescription>
-            </Alert>
-          )}
         </div>
 
-        {/* Error State */}
-        {predictionError && (
-          <Alert className="border-l-4 border-l-destructive bg-destructive/10 mb-6">
-            <AlertTriangle className="h-4 w-4 text-destructive" />
-            <AlertDescription className="text-destructive">
-              Erreur lors du chargement des données. Veuillez réessayer.
-            </AlertDescription>
-          </Alert>
-        )}
 
-        {/* Players Tables */}
-        {matchPrediction && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <MatchDetailsTable
-              teamName={currentGame.awayTeam}
-              players={matchPrediction.away_players}
-              isHomeTeam={false}
-            />
-            <MatchDetailsTable
-              teamName={currentGame.homeTeam}
-              players={matchPrediction.home_players}
-              isHomeTeam={true}
-            />
-          </div>
+        {/* Interactive Match Simulator */}
+        {homeTeamId && awayTeamId && (
+          <MatchSimulator
+            homeTeamId={homeTeamId}
+            awayTeamId={awayTeamId}
+            homeTeamName={currentGame.homeTeam}
+            awayTeamName={currentGame.awayTeam}
+          />
         )}
       </main>
 

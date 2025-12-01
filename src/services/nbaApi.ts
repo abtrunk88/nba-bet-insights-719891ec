@@ -151,13 +151,26 @@ export interface MatchupAnalysis {
   [key: string]: any;
 }
 
+export interface PlayerContext {
+  boost_applied: string;
+  blowout_penalty: string;
+  form_weight: string;
+}
+
 export interface PlayerFullPrediction {
   player: string;
   position?: string;
+  player_id: number;
   predicted_stats: PlayerPredictedStats;
   advanced_metrics_projected: AdvancedMetricsProjected;
   matchup_analysis?: MatchupAnalysis;
+  context?: PlayerContext;
   blowout_analysis: BlowoutAnalysis;
+}
+
+export interface MatchContext {
+  home_usage_boost: number;
+  away_usage_boost: number;
 }
 
 export interface FullMatchPrediction {
@@ -166,6 +179,12 @@ export interface FullMatchPrediction {
   blowout_analysis?: {
     risk_level: "LOW" | "HIGH" | "MEDIUM";
   };
+}
+
+export interface InteractiveMatchPrediction {
+  match_context: MatchContext;
+  home_players: PlayerFullPrediction[];
+  away_players: PlayerFullPrediction[];
 }
 
 export const nbaApi = {
@@ -257,6 +276,25 @@ export const nbaApi = {
   ): Promise<FullMatchPrediction> {
     const response = await fetch(`${API_BASE_URL}/predict/full-match/${homeTeamId}/${awayTeamId}`);
     if (!response.ok) throw new Error("Failed to fetch full match prediction");
+    return response.json();
+  },
+
+  async getFullMatchPredictionWithAbsents(
+    homeTeamId: string,
+    awayTeamId: string,
+    homeAbsentIds?: number[],
+    awayAbsentIds?: number[]
+  ): Promise<InteractiveMatchPrediction> {
+    const params = new URLSearchParams();
+    if (homeAbsentIds && homeAbsentIds.length > 0) {
+      homeAbsentIds.forEach(id => params.append("home_absent", id.toString()));
+    }
+    if (awayAbsentIds && awayAbsentIds.length > 0) {
+      awayAbsentIds.forEach(id => params.append("away_absent", id.toString()));
+    }
+    const queryString = params.toString() ? `?${params.toString()}` : "";
+    const response = await fetch(`${API_BASE_URL}/predict/full-match/${homeTeamId}/${awayTeamId}${queryString}`);
+    if (!response.ok) throw new Error("Failed to fetch interactive match prediction");
     return response.json();
   },
 };
