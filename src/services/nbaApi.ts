@@ -187,4 +187,13 @@ export const nbaApi = {
     if (!response.ok) throw new Error("Failed to predict player stats");
     return response.json();
   },
+
+  async analyzeMissingPlayer(
+    teamCode: string,
+    playerId: number
+  ): Promise<MissingPlayerAnalysis> {
+    const response = await fetch(`${API_BASE_URL}/analytics/team/${teamCode}/missing-player/${playerId}`);
+    if (!response.ok) throw new Error("Failed to analyze missing player impact");
+    return response.json();
+  },
 };
