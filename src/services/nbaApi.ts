@@ -130,6 +130,44 @@ export interface MissingPlayerAnalysis {
   stats_without: PlayerStats;
 }
 
+export interface PlayerPredictedStats {
+  PTS: number;
+  REB: number;
+  AST: number;
+  MIN: number;
+  FG3M: number;
+}
+
+export interface AdvancedMetricsProjected {
+  PRA: number;
+}
+
+export interface BlowoutAnalysis {
+  risk_level: "LOW" | "HIGH" | "MEDIUM";
+}
+
+export interface MatchupAnalysis {
+  paint_vulnerability?: number;
+  [key: string]: any;
+}
+
+export interface PlayerFullPrediction {
+  player: string;
+  position?: string;
+  predicted_stats: PlayerPredictedStats;
+  advanced_metrics_projected: AdvancedMetricsProjected;
+  matchup_analysis?: MatchupAnalysis;
+  blowout_analysis: BlowoutAnalysis;
+}
+
+export interface FullMatchPrediction {
+  home_players: PlayerFullPrediction[];
+  away_players: PlayerFullPrediction[];
+  blowout_analysis?: {
+    risk_level: "LOW" | "HIGH" | "MEDIUM";
+  };
+}
+
 export const nbaApi = {
   // CORRECTION ICI : passage à 30h pour correspondre au backend
   async get48hGames(): Promise<TodayGame[]> {
