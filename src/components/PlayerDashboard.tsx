@@ -45,6 +45,16 @@ export function PlayerDashboard({ player }: PlayerDashboardProps) {
     enabled: false,
   });
 
+  const { data: missingPlayerAnalysis, isLoading: impactLoading } = useQuery({
+    queryKey: ["missing-player-analysis", player.id, player.team],
+    queryFn: () => {
+      const teamCode = player.team ? getTeamCode(player.team) : "";
+      if (!teamCode) throw new Error("Team code not found");
+      return nbaApi.analyzeMissingPlayer(teamCode, player.id);
+    },
+    enabled: showImpactAnalyzer && !!player.team,
+  });
+
   const handleVsTeamSearch = () => {
     const teamCode = vsTeamInput.trim().toUpperCase();
     if (teamCode) {
