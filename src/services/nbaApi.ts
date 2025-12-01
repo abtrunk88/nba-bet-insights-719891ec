@@ -160,7 +160,7 @@ export interface PlayerContext {
 export interface PlayerFullPrediction {
   player: string;
   position?: string;
-  player_id?: number;
+  player_id: number;
   predicted_stats: PlayerPredictedStats;
   advanced_metrics_projected: AdvancedMetricsProjected;
   matchup_analysis?: MatchupAnalysis;
