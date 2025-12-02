@@ -85,20 +85,30 @@ export interface ContextAnalysis {
 }
 
 export interface MatchPrediction {
-  home_team: string;
-  away_team: string;
   predicted_winner: string;
   predicted_margin: number;
-  confidence_level: string;
   win_probability_home: number;
   predicted_total_points: number;
-  details: {
-    home_net_rtg: number;
-    away_net_rtg: number;
-    spread_raw: number;
+  confidence_level?: string; // Optionnel selon ton backend
+  
+  // Le nouveau champ clé du Backend v1.7
+  math_breakdown: {
+    base_spread: { value: number; desc: string };
+    fatigue_adjust: { value: number; desc: string };
+    absences_adjust: { value: number; desc: string };
+    final_spread: number;
   };
-  context_analysis?: ContextAnalysis;
-  absences_impact?: AbsencesImpact;
+  
+  context_analysis: {
+    home_fatigue_factors: string[];
+    away_fatigue_factors: string[];
+  };
+  
+  details: {
+    spread_raw: number;
+    home_net_rtg?: number; // Si dispo
+    away_net_rtg?: number; // Si dispo
+  };
 }
 
 export interface PlayerProjection {

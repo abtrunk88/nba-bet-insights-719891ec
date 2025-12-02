@@ -27,11 +27,10 @@ import { nbaApi, TodayGame, Player } from "@/services/nbaApi";
 import {
   Brain,
   Trophy,
-  Activity,
+  Zap,
   X,
   ChevronsUpDown,
   AlertCircle,
-  Zap,
   TrendingDown,
 } from "lucide-react";
 import { getTeamCode } from "@/lib/teamMapping";
@@ -242,7 +241,7 @@ export function MatchPredictionModal({
                         {prediction.predicted_winner}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Marge : +{Math.abs(prediction.predicted_margin).toFixed(1)} pts
+                        Marge : +{(Math.abs(prediction?.predicted_margin || 0)).toFixed(1)} pts
                       </p>
                     </div>
                   </div>
@@ -264,11 +263,11 @@ export function MatchPredictionModal({
                           {game?.homeTeam}
                         </span>
                         <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
-                          {Math.max(0, prediction.win_probability_home).toFixed(0)}%
+                          {(Math.max(0, prediction?.win_probability_home || 0)).toFixed(0)}%
                         </span>
                       </div>
                       <Progress
-                        value={Math.max(0, prediction.win_probability_home)}
+                        value={Math.max(0, prediction?.win_probability_home || 0)}
                         className="h-2"
                       />
                     </div>
@@ -276,14 +275,14 @@ export function MatchPredictionModal({
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-bold text-amber-600 dark:text-amber-400">
-                          {Math.max(0, 100 - prediction.win_probability_home).toFixed(0)}%
+                          {(Math.max(0, 100 - (prediction?.win_probability_home || 0))).toFixed(0)}%
                         </span>
                         <span className="text-sm font-medium text-amber-600 dark:text-amber-400">
                           {game?.awayTeam}
                         </span>
                       </div>
                       <Progress
-                        value={Math.max(0, 100 - prediction.win_probability_home)}
+                        value={Math.max(0, 100 - (prediction?.win_probability_home || 0))}
                         className="h-2"
                       />
                     </div>
@@ -304,7 +303,7 @@ export function MatchPredictionModal({
                         prediction?.confidence_level
                       )}`}
                     >
-                      {prediction?.confidence_level}
+                      {prediction?.confidence_level || "Analyse en cours..."}
                     </Badge>
                   </div>
                 </Card>
@@ -317,7 +316,7 @@ export function MatchPredictionModal({
                     </span>
                     <div className="flex items-baseline gap-1">
                       <span className="text-2xl font-bold text-teal-600 dark:text-teal-400">
-                        ~{prediction.predicted_total_points.toFixed(0)}
+                        ~{(prediction?.predicted_total_points || 0).toFixed(0)}
                       </span>
                       <span className="text-xs text-muted-foreground">pts</span>
                     </div>
@@ -351,163 +350,93 @@ export function MatchPredictionModal({
               </div>
             )}
 
-            {/* SECTION 3: IMPACT DES ABSENCES */}
-            {prediction.absences_impact &&
-              (homeMissingPlayers.length > 0 ||
-                awayMissingPlayers.length > 0) && (
-                <div className="border-t pt-4">
-                  <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3 tracking-wider">
-                    Impact des Absences (Calcul PIE/Clutch)
-                  </h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {prediction.absences_impact.home_total_penalty > 0 && (
-                      <Card
-                        className={`p-3 border-l-4 border-l-red-500 ${
-                          prediction.absences_impact.home_total_penalty > 3
-                            ? "bg-red-500/10"
-                            : "bg-orange-500/5"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs font-medium text-muted-foreground">
-                              {game?.homeTeam}
-                            </p>
-                            <p
-                              className={`text-lg font-bold ${
-                                prediction.absences_impact.home_total_penalty > 3
-                                  ? "text-red-600 dark:text-red-400"
-                                  : "text-orange-600 dark:text-orange-400"
-                              }`}
-                            >
-                              -{prediction.absences_impact.home_total_penalty.toFixed(1)} pts
-                            </p>
-                          </div>
-                        </div>
-                      </Card>
-                    )}
-                    {prediction.absences_impact.away_total_penalty > 0 && (
-                      <Card
-                        className={`p-3 border-l-4 border-l-red-500 ${
-                          prediction.absences_impact.away_total_penalty > 3
-                            ? "bg-red-500/10"
-                            : "bg-orange-500/5"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
-                          <div>
-                            <p className="text-xs font-medium text-muted-foreground">
-                              {game?.awayTeam}
-                            </p>
-                            <p
-                              className={`text-lg font-bold ${
-                                prediction.absences_impact.away_total_penalty > 3
-                                  ? "text-red-600 dark:text-red-400"
-                                  : "text-orange-600 dark:text-orange-400"
-                              }`}
-                            >
-                              -{prediction.absences_impact.away_total_penalty.toFixed(1)} pts
-                            </p>
-                          </div>
-                        </div>
-                      </Card>
-                    )}
-                    {prediction.absences_impact.home_total_penalty === 0 &&
-                      homeMissingPlayers.length > 0 && (
-                        <Card className="p-3 border-l-4 border-l-gray-400 bg-gray-500/5">
-                          <p className="text-xs font-medium text-muted-foreground">
-                            {game?.homeTeam}
-                          </p>
-                          <p className="text-lg font-bold text-gray-600 dark:text-gray-400">
-                            Pas d'impact détecté
-                          </p>
-                        </Card>
-                      )}
-                    {prediction.absences_impact.away_total_penalty === 0 &&
-                      awayMissingPlayers.length > 0 && (
-                        <Card className="p-3 border-l-4 border-l-gray-400 bg-gray-500/5">
-                          <p className="text-xs font-medium text-muted-foreground">
-                            {game?.awayTeam}
-                          </p>
-                          <p className="text-lg font-bold text-gray-600 dark:text-gray-400">
-                            Pas d'impact détecté
-                          </p>
-                        </Card>
-                      )}
-                  </div>
-                </div>
-              )}
+                        {/* SECTION 3 & 4 REVISITÉES : EXPLICATION DU CALCUL (MATH BREAKDOWN) */}
+            {prediction.math_breakdown && (
+              <div className="border-t pt-4">
+                <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3 tracking-wider flex items-center gap-2">
+                  <Brain className="h-4 w-4" />
+                  Logique de Prédiction
+                </h3>
 
-            {/* SECTION 4: TABLEAU COMPARATIF (STATS) */}
-            <div className="border-t pt-4">
-              <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3 tracking-wider">
-                Analyse Comparative
-              </h3>
-              <Card className="p-3 bg-secondary/30">
-                <div className="space-y-3">
-                  {/* Net Rating */}
-                  <div className="flex justify-between items-center">
-                    <div className="text-left">
-                      <span className="block text-[10px] text-muted-foreground font-semibold mb-1">
-                        {game?.homeTeam}
-                      </span>
-                      <span className="font-bold text-lg text-purple-600 dark:text-purple-400">
-                        {prediction.details.home_net_rtg.toFixed(1)}
-                      </span>
-                      <p className="text-xs text-muted-foreground">Net Rating</p>
-                    </div>
-                    <div className="h-8 w-px bg-border"></div>
-                    <div className="text-center">
-                      <Zap className="h-4 w-4 text-muted-foreground mx-auto mb-1" />
-                      <p className="text-xs font-semibold text-muted-foreground">VS</p>
-                    </div>
-                    <div className="h-8 w-px bg-border"></div>
-                    <div className="text-right">
-                      <span className="block text-[10px] text-muted-foreground font-semibold mb-1">
-                        {game?.awayTeam}
-                      </span>
-                      <span className="font-bold text-lg text-amber-600 dark:text-amber-400">
-                        {prediction.details.away_net_rtg.toFixed(1)}
-                      </span>
-                      <p className="text-xs text-muted-foreground">Net Rating</p>
-                    </div>
+                <Card className="overflow-hidden">
+                  <div className="text-xs grid grid-cols-[1fr_auto_auto] gap-2 p-3 items-center border-b bg-muted/30 font-medium">
+                    <span>Facteur</span>
+                    <span className="text-right">Impact</span>
+                    <span className="text-right w-12">Pts</span>
                   </div>
 
-                  {/* Fatigue Penalty */}
-                  {prediction.context_analysis && (
-                    <div className="border-t pt-3 flex justify-between items-center">
-                      <div className="text-left">
-                        <span className="block text-[10px] text-muted-foreground font-semibold mb-1">
-                          {game?.homeTeam}
-                        </span>
-                        <span className="font-bold text-lg text-red-600 dark:text-red-400">
-                          -{prediction.context_analysis.home_fatigue_penalty.toFixed(1)}
-                        </span>
-                        <p className="text-xs text-muted-foreground">Pénalité Fatigue</p>
-                      </div>
-                      <div className="h-8 w-px bg-border"></div>
-                      <div className="text-center">
-                        <AlertCircle className="h-4 w-4 text-muted-foreground mx-auto mb-1" />
-                        <p className="text-xs font-semibold text-muted-foreground">VS</p>
-                      </div>
-                      <div className="h-8 w-px bg-border"></div>
-                      <div className="text-right">
-                        <span className="block text-[10px] text-muted-foreground font-semibold mb-1">
-                          {game?.awayTeam}
-                        </span>
-                        <span className="font-bold text-lg text-red-600 dark:text-red-400">
-                          -{prediction.context_analysis.away_fatigue_penalty.toFixed(1)}
-                        </span>
-                        <p className="text-xs text-muted-foreground">Pénalité Fatigue</p>
-                      </div>
+                  {/* 1. Base Spread (Net Rating + Home Court) */}
+                  <div className="grid grid-cols-[1fr_auto_auto] gap-2 p-3 items-center border-b border-dashed">
+                    <div>
+                      <span className="font-medium block">Écart de Niveau</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {prediction.math_breakdown.base_spread.desc}
+                      </span>
                     </div>
-                  )}
-                </div>
-              </Card>
-            </div>
+                    <Badge variant="outline" className="text-[10px] h-5">Base</Badge>
+                    <span className={`font-mono font-bold text-right ${prediction.math_breakdown.base_spread.value > 0 ? "text-purple-600" : "text-amber-600"}`}>
+                      {prediction.math_breakdown.base_spread.value > 0 ? "+" : ""}
+                      {prediction.math_breakdown.base_spread.value}
+                    </span>
+                  </div>
 
+                  {/* 2. Fatigue Adjustment */}
+                  <div className="grid grid-cols-[1fr_auto_auto] gap-2 p-3 items-center border-b border-dashed">
+                    <div>
+                      <span className="font-medium block">Fatigue & Calendrier</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {prediction.math_breakdown.fatigue_adjust.desc}
+                      </span>
+                    </div>
+                    {Math.abs(prediction.math_breakdown.fatigue_adjust.value) > 0 ? (
+                      <Badge variant="secondary" className="text-[10px] h-5 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Important</Badge>
+                    ) : (
+                      <span className="text-[10px] text-muted-foreground">-</span>
+                    )}
+                    <span className={`font-mono font-bold text-right ${prediction.math_breakdown.fatigue_adjust.value === 0 ? "text-muted-foreground" : "text-red-500"}`}>
+                      {prediction.math_breakdown.fatigue_adjust.value > 0 ? "+" : ""}
+                      {prediction.math_breakdown.fatigue_adjust.value}
+                    </span>
+                  </div>
+
+                  {/* 3. Absences Adjustment */}
+                  <div className="grid grid-cols-[1fr_auto_auto] gap-2 p-3 items-center border-b border-dashed">
+                    <div>
+                      <span className="font-medium block">Impact Absences</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {homeMissingPlayers.length + awayMissingPlayers.length > 0 
+                          ? `${homeMissingPlayers.length + awayMissingPlayers.length} joueur(s) manquant(s)` 
+                          : "Effectifs complets"}
+                      </span>
+                    </div>
+                    {Math.abs(prediction.math_breakdown.absences_adjust.value) > 2 ? (
+                      <Badge variant="secondary" className="text-[10px] h-5 bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">Majeur</Badge>
+                    ) : (
+                      <span className="text-[10px] text-muted-foreground">-</span>
+                    )}
+                    <span className={`font-mono font-bold text-right ${prediction.math_breakdown.absences_adjust.value === 0 ? "text-muted-foreground" : "text-orange-500"}`}>
+                      {prediction.math_breakdown.absences_adjust.value > 0 ? "+" : ""}
+                      {prediction.math_breakdown.absences_adjust.value}
+                    </span>
+                  </div>
+
+                  {/* RESULTAT FINAL */}
+                  <div className="grid grid-cols-[1fr_auto_auto] gap-2 p-3 items-center bg-primary/5">
+                    <div>
+                      <span className="font-bold text-sm text-primary">SPREAD FINAL ESTIMÉ</span>
+                      <span className="text-[10px] text-muted-foreground block">
+                        Positif = {game?.homeTeam} gagne / Négatif = {game?.awayTeam} gagne
+                      </span>
+                    </div>
+                    <div></div>
+                    <span className={`font-mono font-black text-lg text-right ${prediction.math_breakdown.final_spread > 0 ? "text-purple-600" : "text-amber-600"}`}>
+                      {prediction.math_breakdown.final_spread > 0 ? "+" : ""}
+                      {prediction.math_breakdown.final_spread.toFixed(1)}
+                    </span>
+                  </div>
+                </Card>
+              </div>
+            )}
             {/* SECTION 5: SÉLECTION DES JOUEURS ABSENTS */}
             <div className="space-y-4 border-t pt-4">
               {/* Home Missing Players */}
