@@ -188,6 +188,26 @@ export interface InteractiveMatchPrediction {
   away_players: PlayerFullPrediction[];
 }
 
+export interface PlayerHistoryGame {
+  date: string;
+  min: number;
+  pts: number;
+  reb: number;
+  ast: number;
+  matchup?: string;
+}
+
+export interface PlayerDetailsHistory {
+  recent_form: PlayerHistoryGame[];
+  h2h_history: PlayerHistoryGame[];
+}
+
+export interface CalculatorResult {
+  probability: number;
+  recommendation: string;
+  confidence: string;
+}
+
 export const nbaApi = {
   // CORRECTION ICI : passage à 30h pour correspondre au backend
   async get48hGames(): Promise<TodayGame[]> {
@@ -296,6 +316,36 @@ export const nbaApi = {
     const queryString = params.toString() ? `?${params.toString()}` : "";
     const response = await fetch(`${API_BASE_URL}/predict/full-match/${homeTeamId}/${awayTeamId}${queryString}`);
     if (!response.ok) throw new Error("Failed to fetch interactive match prediction");
+    return response.json();
+  },
+
+  async getPlayerDeepAnalytics(
+    playerId: number,
+    opponentTeamId: string
+  ): Promise<PlayerProjection> {
+    const response = await fetch(`${API_BASE_URL}/predict/deep-analytics/${playerId}/vs/${opponentTeamId}`);
+    if (!response.ok) throw new Error("Failed to fetch player deep analytics");
+    return response.json();
+  },
+
+  async getPlayerDetailsHistory(
+    playerId: number,
+    opponentTeamId: string
+  ): Promise<PlayerDetailsHistory> {
+    const response = await fetch(`${API_BASE_URL}/analysis/player/${playerId}/details/${opponentTeamId}`);
+    if (!response.ok) throw new Error("Failed to fetch player details history");
+    return response.json();
+  },
+
+  async getCalculatorAnalysis(
+    projection: number,
+    line: number,
+    statCategory: string
+  ): Promise<CalculatorResult> {
+    const response = await fetch(
+      `${API_BASE_URL}/predict/calculator?projection=${projection}&line=${line}&stat_category=${statCategory}`
+    );
+    if (!response.ok) throw new Error("Failed to fetch calculator analysis");
     return response.json();
   },
 };
