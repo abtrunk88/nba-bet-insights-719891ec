@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -32,6 +32,9 @@ import {
   ChevronsUpDown,
   AlertCircle,
   TrendingDown,
+  AlertTriangle,
+  ShieldCheck,
+  Skull,
 } from "lucide-react";
 import { getTeamCode } from "@/lib/teamMapping";
 import {
