@@ -378,4 +378,15 @@ export const nbaApi = {
     if (!response.ok) throw new Error("Failed to fetch calculator analysis");
     return response.json();
   },
+
+  async getPlayerPopupData(
+    playerId: number,
+    opponentTeamId: string
+  ): Promise<PlayerPopupData> {
+    const response = await fetch(
+      `${API_BASE_URL}/analysis/player/${playerId}/popup/${opponentTeamId}`
+    );
+    if (!response.ok) throw new Error("Failed to fetch player popup data");
+    return response.json();
+  },
 };
