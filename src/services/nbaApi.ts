@@ -138,6 +138,7 @@ export interface PlayerPredictedStats {
   FG3M: number;
   STL?: number;
   BLK?: number;
+  PTS_RANGE?: string;
 }
 
 export interface AdvancedMetricsProjected {
@@ -157,8 +158,8 @@ export interface MatchupAnalysis {
 
 export interface PlayerContext {
   boost_applied: string;
-  blowout_penalty: string;
-  form_weight: string;
+  blowout_penalty?: string;
+  form_weight?: string;
   reasoning?: string;
 }
 
