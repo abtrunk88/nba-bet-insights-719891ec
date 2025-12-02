@@ -176,6 +176,16 @@ export function MatchDetailsTable({ teamName, players, isHomeTeam = false, oppon
         </div>
       </CardContent>
     </Card>
+    {selectedPlayer && (
+      <PlayerPopupModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        playerId={selectedPlayer.id}
+        playerName={selectedPlayer.name}
+        opponentTeamId={opponentTeamId}
+        opponentTeamName={opponentTeamName}
+      />
+    )}
     </TooltipProvider>
   );
 }
