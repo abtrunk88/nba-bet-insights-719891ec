@@ -83,6 +83,10 @@ export function MatchPredictionModal({
     player.full_name.toLowerCase().includes(awaySearchQuery.toLowerCase())
   );
 
+  // Get top 8 players for each team
+  const topHomePlayers = useMemo(() => homeRoster?.slice(0, 8) || [], [homeRoster]);
+  const topAwayPlayers = useMemo(() => awayRoster?.slice(0, 8) || [], [awayRoster]);
+
   const {
     data: prediction,
     isLoading,
