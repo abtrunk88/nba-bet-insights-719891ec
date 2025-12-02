@@ -7,10 +7,9 @@ import {
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
 import { nbaApi } from "@/services/nbaApi";
-import { Activity, TrendingUp, X } from "lucide-react";
+import { Activity, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PlayerPopupModalProps {
