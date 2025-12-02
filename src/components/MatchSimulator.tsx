@@ -18,7 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { AlertCircle, Flame, AlertTriangle, Battery, Info } from "lucide-react";
+import { AlertCircle, Flame, AlertTriangle, Info } from "lucide-react";
 import { PlayerDetailsModal } from "./PlayerDetailsModal";
 
 interface MatchSimulatorProps {
