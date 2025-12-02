@@ -208,6 +208,36 @@ export interface CalculatorResult {
   confidence: string;
 }
 
+export interface RecentFormAvg {
+  PTS: number;
+  REB: number;
+  AST: number;
+  PRA: number;
+  [key: string]: number;
+}
+
+export interface H2HHistoryGame {
+  GAME_DATE: string;
+  MIN: number;
+  PTS: number;
+  REB: number;
+  AST: number;
+  PRA: number;
+  [key: string]: any;
+}
+
+export interface SeasonTrend {
+  threshold: number;
+  hit_rate: number;
+  message: string;
+}
+
+export interface PlayerPopupData {
+  recent_form_avg: RecentFormAvg;
+  h2h_history: H2HHistoryGame[];
+  season_trend: SeasonTrend;
+}
+
 export const nbaApi = {
   // CORRECTION ICI : passage à 30h pour correspondre au backend
   async get48hGames(): Promise<TodayGame[]> {
@@ -346,6 +376,17 @@ export const nbaApi = {
       `${API_BASE_URL}/predict/calculator?projection=${projection}&line=${line}&stat_category=${statCategory}`
     );
     if (!response.ok) throw new Error("Failed to fetch calculator analysis");
+    return response.json();
+  },
+
+  async getPlayerPopupData(
+    playerId: number,
+    opponentTeamId: string
+  ): Promise<PlayerPopupData> {
+    const response = await fetch(
+      `${API_BASE_URL}/analysis/player/${playerId}/popup/${opponentTeamId}`
+    );
+    if (!response.ok) throw new Error("Failed to fetch player popup data");
     return response.json();
   },
 };
