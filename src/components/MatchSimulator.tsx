@@ -12,7 +12,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlertCircle, Flame, AlertTriangle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { AlertCircle, Flame, AlertTriangle, Battery, Info } from "lucide-react";
 import { PlayerDetailsModal } from "./PlayerDetailsModal";
 
 interface MatchSimulatorProps {
@@ -122,6 +128,18 @@ export function MatchSimulator({
     const allPlayers = [...displayPrediction.home_players, ...displayPrediction.away_players];
     return allPlayers.some((p) => p.blowout_analysis.risk_level === "HIGH");
   }, [displayPrediction]);
+
+  const getBoostColor = (value: string): string => {
+    if (!value || value === "+0.0%" || value === "0.0%") return "";
+    const isPositive = value.startsWith("+");
+    return isPositive
+      ? "text-green-600 dark:text-green-400 font-semibold"
+      : "text-red-600 dark:text-red-400 font-semibold";
+  };
+
+  const hasFatigue = (reasoning?: string): boolean => {
+    return reasoning ? reasoning.toLowerCase().includes("fatigue") : false;
+  };
 
   if (!displayPrediction) {
     return (
