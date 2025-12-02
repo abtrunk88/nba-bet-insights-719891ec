@@ -145,7 +145,7 @@ export function PlayerDetailsModal({
             <DialogTitle className="text-2xl font-bold">
               {player.player}
             </DialogTitle>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm text-muted-foreground">Matchup:</span>
               <Badge variant="outline" className="text-sm">
                 vs {opponentTeamName}
@@ -160,6 +160,27 @@ export function PlayerDetailsModal({
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Blowout Risk Gauge */}
+          <Card className="p-4 border-l-4 border-l-orange-500 bg-orange-50/50 dark:bg-orange-950/20">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {blowoutStatusIcon}
+                  <span className={`font-bold text-sm ${blowoutRiskLevel === "HIGH" ? "text-red-600" : "text-foreground"}`}>
+                    {blowoutStatusText}
+                  </span>
+                </div>
+                <Badge className={`text-xs ${blowoutRiskLevel === "HIGH" ? "bg-red-500" : blowoutRiskLevel === "MEDIUM" ? "bg-yellow-500" : "bg-green-500"}`}>
+                  {blowoutRiskLevel}
+                </Badge>
+              </div>
+              {player.blowout_analysis?.message && (
+                <p className="text-xs text-muted-foreground">
+                  {player.blowout_analysis.message}
+                </p>
+              )}
+            </div>
+          </Card>
           {/* Projection Summary */}
           <Card className="bg-primary/5 border-primary/20">
             <CardContent className="pt-6">
