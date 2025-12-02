@@ -301,10 +301,10 @@ export function MatchPredictionModal({
                     </span>
                     <Badge
                       className={`text-xs px-2 py-1 w-fit ${getConfidenceBadgeColor(
-                        prediction.confidence_level
+                        prediction?.confidence_level
                       )}`}
                     >
-                      {prediction.confidence_level}
+                      {prediction?.confidence_level}
                     </Badge>
                   </div>
                 </Card>
