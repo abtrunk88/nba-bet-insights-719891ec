@@ -231,7 +231,10 @@ export function MatchSimulator({
                             disabled={isLoading}
                           />
                         </TableCell>
-                        <TableCell className="font-medium text-xs truncate">
+                        <TableCell
+                          className="font-medium text-xs truncate cursor-pointer hover:text-primary hover:underline transition-colors"
+                          onClick={() => handlePlayerClick(player, "home")}
+                        >
                           {player.player}
                           {player.position && <span className="text-xs text-muted-foreground ml-1">({player.position})</span>}
                         </TableCell>
@@ -307,7 +310,10 @@ export function MatchSimulator({
                             disabled={isLoading}
                           />
                         </TableCell>
-                        <TableCell className="font-medium text-xs truncate">
+                        <TableCell
+                          className="font-medium text-xs truncate cursor-pointer hover:text-primary hover:underline transition-colors"
+                          onClick={() => handlePlayerClick(player, "away")}
+                        >
                           {player.player}
                           {player.position && <span className="text-xs text-muted-foreground ml-1">({player.position})</span>}
                         </TableCell>
