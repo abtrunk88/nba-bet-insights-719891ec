@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AlertCircle, Flame, AlertTriangle } from "lucide-react";
+import { PlayerDetailsModal } from "./PlayerDetailsModal";
 
 interface MatchSimulatorProps {
   homeTeamId: string;
