@@ -7,10 +7,9 @@ import {
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
 import { nbaApi } from "@/services/nbaApi";
-import { Activity, TrendingUp, X } from "lucide-react";
+import { Activity, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PlayerPopupModalProps {
@@ -103,72 +102,90 @@ export function PlayerPopupModal({
               </Card>
             </div>
 
-            {/* SECTION C: H2H HISTORY (vs Opponent) */}
-            {popupData.h2h_history && popupData.h2h_history.length > 0 && (
+            {/* SECTION C: H2H AVERAGES (vs Opponent - Last 5 Games) */}
+            {popupData.h2h_avg && (
               <div className="space-y-3 border-t pt-4">
-                <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
-                  Historique H2H vs {opponentTeamName}
-                </h3>
-                <Card className="bg-secondary/30">
-                  <CardContent className="p-3">
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow className="border-b border-border/50">
-                            <TableHead className="text-left py-2 px-2 text-xs font-semibold">Date</TableHead>
-                            <TableHead className="text-right py-2 px-2 text-xs font-semibold">Min</TableHead>
-                            <TableHead className="text-right py-2 px-2 text-xs font-semibold">PTS</TableHead>
-                            <TableHead className="text-right py-2 px-2 text-xs font-semibold">REB</TableHead>
-                            <TableHead className="text-right py-2 px-2 text-xs font-semibold">AST</TableHead>
-                            <TableHead className="text-right py-2 px-2 text-xs font-semibold font-bold">PRA</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {popupData.h2h_history.slice(0, 5).map((game, idx) => (
-                            <TableRow
-                              key={idx}
-                              className={cn(
-                                "border-b border-border/30 transition-colors",
-                                game.PTS > 25 ? "bg-green-500/10 hover:bg-green-500/20" : "hover:bg-secondary/50"
-                              )}
-                            >
-                              <TableCell className="py-2 px-2 text-sm text-foreground">
-                                {game.GAME_DATE}
-                              </TableCell>
-                              <TableCell className="py-2 px-2 text-right text-sm text-foreground">
-                                {game.MIN?.toFixed(0) || "0"}
-                              </TableCell>
-                              <TableCell
-                                className={cn(
-                                  "py-2 px-2 text-right text-sm font-semibold",
-                                  game.PTS > 25
-                                    ? "text-green-600 dark:text-green-400 text-base"
-                                    : "text-foreground"
-                                )}
-                              >
-                                {game.PTS?.toFixed(0) || "0"}
-                              </TableCell>
-                              <TableCell className="py-2 px-2 text-right text-sm text-foreground">
-                                {game.REB?.toFixed(1) || "0.0"}
-                              </TableCell>
-                              <TableCell className="py-2 px-2 text-right text-sm text-foreground">
-                                {game.AST?.toFixed(1) || "0.0"}
-                              </TableCell>
-                              <TableCell className="py-2 px-2 text-right text-sm font-bold text-primary">
-                                {game.PRA?.toFixed(1) || "0.0"}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                    {popupData.h2h_history.length > 5 && (
-                      <p className="text-xs text-muted-foreground mt-2 px-2">
-                        Affichage des 5 derniers matchs (total: {popupData.h2h_history.length})
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
+                {popupData.h2h_avg.GP === 0 ? (
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
+                      Moyenne vs {opponentTeamName} (5 derniers matchs)
+                    </h3>
+                    <Card className="bg-secondary/30">
+                      <CardContent className="p-4">
+                        <p className="text-center text-sm text-muted-foreground">
+                          Aucun historique récent
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">
+                      Moyenne vs {opponentTeamName} (5 derniers matchs)
+                    </h3>
+                    <Card className="bg-secondary/30">
+                      <CardContent className="p-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          {/* PTS */}
+                          <div className="bg-primary/10 p-3 rounded-lg border border-primary/20 text-center">
+                            <p className="text-xs text-muted-foreground font-semibold mb-1">PTS</p>
+                            <p className="text-3xl font-bold text-primary">
+                              {popupData.h2h_avg.PTS?.toFixed(1) || "0.0"}
+                            </p>
+                          </div>
+
+                          {/* REB */}
+                          <div className="bg-nba-blue/10 p-3 rounded-lg border border-nba-blue/20 text-center">
+                            <p className="text-xs text-muted-foreground font-semibold mb-1">REB</p>
+                            <p className="text-3xl font-bold text-nba-blue">
+                              {popupData.h2h_avg.REB?.toFixed(1) || "0.0"}
+                            </p>
+                          </div>
+
+                          {/* AST */}
+                          <div className="bg-accent/10 p-3 rounded-lg border border-accent/20 text-center">
+                            <p className="text-xs text-muted-foreground font-semibold mb-1">AST</p>
+                            <p className="text-3xl font-bold text-accent">
+                              {popupData.h2h_avg.AST?.toFixed(1) || "0.0"}
+                            </p>
+                          </div>
+
+                          {/* PRA - Highlighted */}
+                          <div className="bg-gradient-to-br from-purple-500/20 to-purple-500/5 p-3 rounded-lg border-2 border-purple-500/40 text-center">
+                            <p className="text-xs text-muted-foreground font-semibold mb-1">PRA</p>
+                            <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                              {popupData.h2h_avg.PRA?.toFixed(1) || "0.0"}
+                            </p>
+                          </div>
+
+                          {/* PR */}
+                          <div className="bg-orange-500/10 p-3 rounded-lg border border-orange-500/20 text-center">
+                            <p className="text-xs text-muted-foreground font-semibold mb-1">PR</p>
+                            <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">
+                              {popupData.h2h_avg.PR?.toFixed(1) || "0.0"}
+                            </p>
+                          </div>
+
+                          {/* PA */}
+                          <div className="bg-cyan-500/10 p-3 rounded-lg border border-cyan-500/20 text-center">
+                            <p className="text-xs text-muted-foreground font-semibold mb-1">PA</p>
+                            <p className="text-3xl font-bold text-cyan-600 dark:text-cyan-400">
+                              {popupData.h2h_avg.PA?.toFixed(1) || "0.0"}
+                            </p>
+                          </div>
+
+                          {/* AR */}
+                          <div className="bg-pink-500/10 p-3 rounded-lg border border-pink-500/20 text-center">
+                            <p className="text-xs text-muted-foreground font-semibold mb-1">AR</p>
+                            <p className="text-3xl font-bold text-pink-600 dark:text-pink-400">
+                              {popupData.h2h_avg.AR?.toFixed(1) || "0.0"}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
               </div>
             )}
 
