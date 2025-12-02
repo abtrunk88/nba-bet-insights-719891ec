@@ -603,6 +603,28 @@ export function MatchPredictionModal({
                 <label className="text-xs font-semibold text-muted-foreground block mb-2">
                   JOUEURS ABSENTS - {game?.awayTeam}
                 </label>
+                {topAwayPlayers.length > 0 && (
+                  <div className="mb-2 flex flex-wrap gap-1">
+                    {topAwayPlayers.slice(0, 8).map((player) => {
+                      const isAlreadySelected = awayMissingPlayers.find(p => p.id === player.id);
+                      return (
+                        <button
+                          key={player.id}
+                          onClick={() => !isAlreadySelected && addAwayMissingPlayer(player)}
+                          disabled={!!isAlreadySelected}
+                          className={`text-[11px] px-2 py-1 rounded border transition-colors ${
+                            isAlreadySelected
+                              ? "bg-primary/20 border-primary text-primary cursor-default opacity-50"
+                              : "bg-muted hover:bg-muted/80 border-border hover:border-primary/50 cursor-pointer"
+                          }`}
+                          title={isAlreadySelected ? "Déjà sélectionné" : "Cliquer pour ajouter"}
+                        >
+                          {player.full_name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
                 <Popover
                   open={awayPopoverOpen}
                   onOpenChange={setAwayPopoverOpen}
