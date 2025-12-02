@@ -32,6 +32,14 @@ interface PlayerDetailsModalProps {
 
 type StatCategory = "PTS" | "REB" | "AST" | "PRA";
 
+interface BlowoutRiskGaugeProps {
+  blowoutAnalysis?: {
+    risk_level: "LOW" | "HIGH" | "MEDIUM";
+    message?: string;
+    margin?: number;
+  };
+}
+
 const getProjectionValue = (
   player: PlayerFullPrediction,
   stat: StatCategory
