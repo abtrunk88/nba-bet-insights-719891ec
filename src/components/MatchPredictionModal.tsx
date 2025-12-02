@@ -352,6 +352,39 @@ export function MatchPredictionModal({
                   </div>
                 </Card>
               </div>
+
+              {/* Blowout Risk Gauge */}
+              <Card className="p-3 border-l-4 border-l-orange-500">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      RISQUE DE BLOWOUT
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-end gap-2 mb-2">
+                    <div className="flex items-center gap-2">
+                      {blowoutStatusIcon}
+                      <span className={`text-sm font-bold ${blowoutMargin >= 16 ? "text-red-600" : "text-foreground"}`}>
+                        {blowoutStatusText}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xl font-black">{blowoutMargin.toFixed(1)}</span>
+                      <span className="text-[10px] text-muted-foreground ml-1">pts</span>
+                    </div>
+                  </div>
+
+                  <div className="h-3 w-full bg-secondary rounded-full overflow-hidden relative">
+                    <div className="absolute top-0 bottom-0 left-[40%] w-0.5 bg-white/20 z-10" title="10pts Threshold" />
+                    <div className="absolute top-0 bottom-0 left-[64%] w-0.5 bg-white/20 z-10" title="16pts Threshold (Blowout)" />
+                    <div
+                      className={`h-full transition-all duration-300 ease-out ${blowoutStatusColor}`}
+                      style={{ width: `${blowoutPercentage}%` }}
+                    />
+                  </div>
+                </div>
+              </Card>
             </div>
 
             {/* SECTION 2: CONTEXTE & FATIGUE */}
