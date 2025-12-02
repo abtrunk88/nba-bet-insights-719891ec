@@ -163,6 +163,28 @@ export function MatchPredictionModal({
       : "text-amber-600 dark:text-amber-400";
   };
 
+  // Blowout Risk Gauge Colors & Logic
+  const blowoutMargin = prediction ? Math.abs(prediction.predicted_margin) : 0;
+  const blowoutPercentage = Math.min((blowoutMargin / 25) * 100, 100);
+
+  let blowoutStatusColor = "bg-green-500";
+  let blowoutStatusText = "Safe / Close Game";
+  let blowoutStatusIcon = <ShieldCheck className="h-4 w-4 text-green-600" />;
+
+  if (blowoutMargin >= 10 && blowoutMargin < 16) {
+    blowoutStatusColor = "bg-yellow-500";
+    blowoutStatusText = "Clear Advantage";
+    blowoutStatusIcon = <TrendingDown className="h-4 w-4 text-yellow-600" />;
+  } else if (blowoutMargin >= 16 && blowoutMargin < 24) {
+    blowoutStatusColor = "bg-orange-500";
+    blowoutStatusText = "Risk: Blowout";
+    blowoutStatusIcon = <AlertTriangle className="h-4 w-4 text-orange-600" />;
+  } else if (blowoutMargin >= 24) {
+    blowoutStatusColor = "bg-red-600 animate-pulse";
+    blowoutStatusText = "EXTREME DANGER";
+    blowoutStatusIcon = <Skull className="h-4 w-4 text-red-600" />;
+  }
+
   const renderFatigueSection = (
     teamName: string | undefined,
     factors: string[] | undefined,
