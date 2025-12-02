@@ -20,7 +20,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp, Flame, CalendarDays, Trophy } from "lucide-react";
+import { TrendingUp, Flame, CalendarDays, Trophy, AlertTriangle, ShieldCheck, Skull } from "lucide-react";
 
 interface PlayerDetailsModalProps {
   isOpen: boolean;
