@@ -85,6 +85,15 @@ export function PlayerDetailsModal({
     enabled: false,
   });
 
+  // Fetch opponent team roster for top 8 players
+  const { data: opponentRoster = [] } = useQuery({
+    queryKey: ["team-roster", opponentTeamId],
+    queryFn: () => nbaApi.getTeamRoster(opponentTeamId),
+    enabled: isOpen && !!opponentTeamId,
+  });
+
+  const topOpponentPlayers = useMemo(() => opponentRoster?.slice(0, 8) || [], [opponentRoster]);
+
   const handleAnalyze = () => {
     if (bookmakerLine && parseFloat(bookmakerLine) > 0) {
       analyzeCalculator();
