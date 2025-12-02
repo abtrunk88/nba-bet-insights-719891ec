@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { nbaApi, TodayGame } from "@/services/nbaApi";
 import { MatchSimulator } from "@/components/MatchSimulator";
+import { BlowoutRiskSimulator } from "@/components/BlowoutRiskSimulator";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
