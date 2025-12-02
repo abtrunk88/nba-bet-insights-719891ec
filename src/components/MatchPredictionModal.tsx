@@ -242,7 +242,7 @@ export function MatchPredictionModal({
                         {prediction.predicted_winner}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Marge : +{Math.abs(prediction.predicted_margin).toFixed(1)} pts
+                        Marge : +{Math.abs(prediction?.predicted_margin || 0).toFixed(1)} pts
                       </p>
                     </div>
                   </div>
@@ -264,11 +264,11 @@ export function MatchPredictionModal({
                           {game?.homeTeam}
                         </span>
                         <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
-                          {Math.max(0, prediction.win_probability_home).toFixed(0)}%
+                          {Math.max(0, prediction?.win_probability_home || 0).toFixed(0)}%
                         </span>
                       </div>
                       <Progress
-                        value={Math.max(0, prediction.win_probability_home)}
+                        value={Math.max(0, prediction?.win_probability_home || 0)}
                         className="h-2"
                       />
                     </div>
@@ -276,14 +276,14 @@ export function MatchPredictionModal({
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-bold text-amber-600 dark:text-amber-400">
-                          {Math.max(0, 100 - prediction.win_probability_home).toFixed(0)}%
+                          {Math.max(0, 100 - (prediction?.win_probability_home || 0)).toFixed(0)}%
                         </span>
                         <span className="text-sm font-medium text-amber-600 dark:text-amber-400">
                           {game?.awayTeam}
                         </span>
                       </div>
                       <Progress
-                        value={Math.max(0, 100 - prediction.win_probability_home)}
+                        value={Math.max(0, 100 - (prediction?.win_probability_home || 0))}
                         className="h-2"
                       />
                     </div>
@@ -317,7 +317,7 @@ export function MatchPredictionModal({
                     </span>
                     <div className="flex items-baseline gap-1">
                       <span className="text-2xl font-bold text-teal-600 dark:text-teal-400">
-                        ~{prediction.predicted_total_points.toFixed(0)}
+                        ~{(prediction?.predicted_total_points || 0).toFixed(0)}
                       </span>
                       <span className="text-xs text-muted-foreground">pts</span>
                     </div>
@@ -441,6 +441,7 @@ export function MatchPredictionModal({
               )}
 
             {/* SECTION 4: TABLEAU COMPARATIF (STATS) */}
+            {prediction?.details && (
             <div className="border-t pt-4">
               <h3 className="text-xs font-bold text-muted-foreground uppercase mb-3 tracking-wider">
                 Analyse Comparative
@@ -454,7 +455,7 @@ export function MatchPredictionModal({
                         {game?.homeTeam}
                       </span>
                       <span className="font-bold text-lg text-purple-600 dark:text-purple-400">
-                        {prediction.details.home_net_rtg.toFixed(1)}
+                        {(prediction?.details?.home_net_rtg || 0).toFixed(1)}
                       </span>
                       <p className="text-xs text-muted-foreground">Net Rating</p>
                     </div>
@@ -469,7 +470,7 @@ export function MatchPredictionModal({
                         {game?.awayTeam}
                       </span>
                       <span className="font-bold text-lg text-amber-600 dark:text-amber-400">
-                        {prediction.details.away_net_rtg.toFixed(1)}
+                        {(prediction?.details?.away_net_rtg || 0).toFixed(1)}
                       </span>
                       <p className="text-xs text-muted-foreground">Net Rating</p>
                     </div>
@@ -507,6 +508,7 @@ export function MatchPredictionModal({
                 </div>
               </Card>
             </div>
+            )}
 
             {/* SECTION 5: SÉLECTION DES JOUEURS ABSENTS */}
             <div className="space-y-4 border-t pt-4">
