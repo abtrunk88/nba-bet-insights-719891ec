@@ -190,6 +190,17 @@ export function MatchSimulator({
         </Card>
       )}
 
+      {/* Player Details Modal */}
+      {selectedPlayer && (
+        <PlayerDetailsModal
+          isOpen={modalOpen}
+          onOpenChange={setModalOpen}
+          player={selectedPlayer}
+          opponentTeamName={modalTeam === "home" ? awayTeamName : homeTeamName}
+          opponentTeamId={modalTeam === "home" ? awayTeamId : homeTeamId}
+        />
+      )}
+
       {/* Two-Column Layout: Home & Away Teams */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Home Team Players Table */}
