@@ -188,6 +188,26 @@ export interface InteractiveMatchPrediction {
   away_players: PlayerFullPrediction[];
 }
 
+export interface PlayerHistoryGame {
+  date: string;
+  min: number;
+  pts: number;
+  reb: number;
+  ast: number;
+  matchup?: string;
+}
+
+export interface PlayerDetailsHistory {
+  recent_form: PlayerHistoryGame[];
+  h2h_history: PlayerHistoryGame[];
+}
+
+export interface CalculatorResult {
+  probability: number;
+  recommendation: string;
+  confidence: string;
+}
+
 export const nbaApi = {
   // CORRECTION ICI : passage à 30h pour correspondre au backend
   async get48hGames(): Promise<TodayGame[]> {
