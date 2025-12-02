@@ -136,6 +136,8 @@ export interface PlayerPredictedStats {
   AST: number;
   MIN: number;
   FG3M: number;
+  STL?: number;
+  BLK?: number;
 }
 
 export interface AdvancedMetricsProjected {
@@ -144,6 +146,8 @@ export interface AdvancedMetricsProjected {
 
 export interface BlowoutAnalysis {
   risk_level: "LOW" | "HIGH" | "MEDIUM";
+  message?: string;
+  margin?: number;
 }
 
 export interface MatchupAnalysis {
@@ -172,6 +176,9 @@ export interface PlayerFullPrediction {
 export interface MatchContext {
   home_usage_boost: number;
   away_usage_boost: number;
+  home_absent_count?: number;
+  away_absent_count?: number;
+  status?: string;
 }
 
 export interface FullMatchPrediction {
@@ -188,32 +195,22 @@ export interface InteractiveMatchPrediction {
   away_players: PlayerFullPrediction[];
 }
 
-export interface PlayerHistoryGame {
-  date: string;
-  min: number;
-  pts: number;
-  reb: number;
-  ast: number;
-  matchup?: string;
-}
-
-export interface PlayerDetailsHistory {
-  recent_form: PlayerHistoryGame[];
-  h2h_history: PlayerHistoryGame[];
-}
-
-export interface CalculatorResult {
-  probability: number;
-  recommendation: string;
-  confidence: string;
-}
+// --- NOUVELLES INTERFACES POUR LE POPUP CORRIGÉ ---
 
 export interface RecentFormAvg {
   PTS: number;
   REB: number;
   AST: number;
   PRA: number;
-  [key: string]: number;
+  // AJOUTEZ CES DEUX LIGNES :
+  STL?: number;
+  BLK?: number;
+  
+  PA?: number; 
+  PR?: number;
+  MIN?: number;
+  GP?: number;
+  [key: string]: number | undefined;
 }
 
 export interface H2HAvg {
@@ -221,10 +218,15 @@ export interface H2HAvg {
   PTS: number;
   REB: number;
   AST: number;
+  // AJOUTEZ CES DEUX LIGNES :
+  STL?: number;
+  BLK?: number;
+  
   PRA: number;
   PR: number;
   PA: number;
   AR: number;
+  [key: string]: number | undefined | string; // Pour gérer "message" si présent
 }
 
 export interface SeasonTrend {
@@ -233,14 +235,31 @@ export interface SeasonTrend {
   message: string;
 }
 
+// Mise à jour de PlayerDetailsHistory pour correspondre à la réponse du backend
+export interface PlayerDetailsHistory {
+  // L'API renvoie maintenant des objets de moyennes, plus des tableaux
+  recent_form_avg: RecentFormAvg;
+  h2h_avg: H2HAvg;
+  season_trend?: SeasonTrend;
+  
+  // On garde ces champs optionnels au cas où vous utiliseriez encore l'ancienne version quelque part
+  recent_form?: any[]; 
+  h2h_history?: any[];
+}
+
 export interface PlayerPopupData {
   recent_form_avg: RecentFormAvg;
   h2h_avg: H2HAvg;
   season_trend: SeasonTrend;
 }
 
+export interface CalculatorResult {
+  probability: number;
+  recommendation: string;
+  confidence: string;
+}
+
 export const nbaApi = {
-  // CORRECTION ICI : passage à 30h pour correspondre au backend
   async get48hGames(): Promise<TodayGame[]> {
     const response = await fetch(`${API_BASE_URL}/games/30h`);
     if (!response.ok) throw new Error("Failed to fetch games");
@@ -338,6 +357,10 @@ export const nbaApi = {
     awayAbsentIds?: number[]
   ): Promise<InteractiveMatchPrediction> {
     const params = new URLSearchParams();
+    // Correction : Ajout du repos par défaut
+    params.append("home_rest", "1");
+    params.append("away_rest", "1");
+    
     if (homeAbsentIds && homeAbsentIds.length > 0) {
       homeAbsentIds.forEach(id => params.append("home_absent", id.toString()));
     }
@@ -359,11 +382,12 @@ export const nbaApi = {
     return response.json();
   },
 
+  // CORRECTION CRITIQUE : Pointe maintenant vers l'endpoint qui marche (/popup)
   async getPlayerDetailsHistory(
     playerId: number,
     opponentTeamId: string
   ): Promise<PlayerDetailsHistory> {
-    const response = await fetch(`${API_BASE_URL}/analysis/player/${playerId}/details/${opponentTeamId}`);
+    const response = await fetch(`${API_BASE_URL}/analysis/player/${playerId}/popup/${opponentTeamId}`);
     if (!response.ok) throw new Error("Failed to fetch player details history");
     return response.json();
   },

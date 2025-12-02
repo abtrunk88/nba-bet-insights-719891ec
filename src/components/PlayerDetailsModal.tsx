@@ -8,14 +8,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,8 +19,8 @@ import {
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Flame } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { TrendingUp, Flame, CalendarDays, Trophy } from "lucide-react";
 
 interface PlayerDetailsModalProps {
   isOpen: boolean;
@@ -39,13 +31,6 @@ interface PlayerDetailsModalProps {
 }
 
 type StatCategory = "PTS" | "REB" | "AST" | "PRA";
-
-const STAT_DISPLAY_NAMES: Record<StatCategory, string> = {
-  PTS: "Points",
-  REB: "Rebounds",
-  AST: "Assists",
-  PRA: "PTS+REB+AST",
-};
 
 const getProjectionValue = (
   player: PlayerFullPrediction,
@@ -104,8 +89,8 @@ export function PlayerDetailsModal({
     setCalculatorOpen(false);
   };
 
-  const recentForm = useMemo(() => {
-    return historyData?.recent_form || [];
+  const recentFormAvg = useMemo(() => {
+    return historyData?.recent_form_avg || null;
   }, [historyData]);
 
   const h2hAverage = useMemo(() => {
@@ -122,7 +107,6 @@ export function PlayerDetailsModal({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        {/* Header */}
         <DialogHeader className="border-b pb-4">
           <div className="space-y-2">
             <DialogTitle className="text-2xl font-bold">
@@ -142,7 +126,6 @@ export function PlayerDetailsModal({
           </div>
         </DialogHeader>
 
-        {/* Main Content */}
         <div className="space-y-6">
           {/* Projection Summary */}
           <Card className="bg-primary/5 border-primary/20">
@@ -152,152 +135,118 @@ export function PlayerDetailsModal({
                   <p className="text-3xl font-bold text-primary">
                     {player.predicted_stats.MIN.toFixed(1)}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">MIN</p>
+                  <p className="text-xs text-muted-foreground mt-1">MIN Prévues</p>
                 </div>
                 <div className="text-center">
                   <p className="text-3xl font-bold text-primary">
                     {player.predicted_stats.PTS.toFixed(1)}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">PTS</p>
+                  <p className="text-xs text-muted-foreground mt-1">PTS Prévus</p>
                 </div>
                 <div className="text-center">
                   <p className="text-3xl font-bold text-primary">
                     {player.advanced_metrics_projected.PRA.toFixed(1)}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">PRA</p>
+                  <p className="text-xs text-muted-foreground mt-1">PRA Prévu</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* History Tabs */}
+          {/* HISTORIQUE */}
           <div>
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-              <TrendingUp className="inline-block h-4 w-4 mr-2" />
-              HISTORIQUE
+            <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              HISTORIQUE & FORMES
             </h3>
             <Tabs defaultValue="recent" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="recent">Forme Récente (10 matchs)</TabsTrigger>
+                <TabsTrigger value="recent">Forme Récente (6 matchs)</TabsTrigger>
                 <TabsTrigger value="h2h">Face-à-Face (H2H)</TabsTrigger>
               </TabsList>
 
-              {/* Recent Form Tab */}
-              <TabsContent value="recent" className="space-y-4">
+              {/* --- ONGLETS 1 : FORME RÉCENTE --- */}
+              <TabsContent value="recent" className="space-y-4 pt-4">
                 {historyLoading ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                   </div>
-                ) : recentForm.length > 0 ? (
-                  <div className="border rounded-lg overflow-hidden">
-                    <Table className="text-sm">
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Date</TableHead>
-                          <TableHead className="text-right">MIN</TableHead>
-                          <TableHead className="text-right">PTS</TableHead>
-                          <TableHead className="text-right">REB</TableHead>
-                          <TableHead className="text-right">AST</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {recentForm.map((game, idx) => (
-                          <TableRow key={idx} className="hover:bg-muted/50">
-                            <TableCell className="font-medium text-xs">
-                              {new Date(game.date).toLocaleDateString("fr-FR", {
-                                month: "2-digit",
-                                day: "2-digit",
-                              })}
-                            </TableCell>
-                            <TableCell className="text-right">{game.min}</TableCell>
-                            <TableCell className="text-right font-semibold">
-                              {game.pts}
-                            </TableCell>
-                            <TableCell className="text-right">{game.reb}</TableCell>
-                            <TableCell className="text-right">{game.ast}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                ) : recentFormAvg ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CalendarDays className="h-4 w-4 text-blue-500" />
+                      <p className="text-sm text-muted-foreground font-medium">
+                        Moyenne sur les {recentFormAvg.GP || 6} derniers matchs
+                      </p>
+                    </div>
+                    
+                    {/* Grille de 8 Stats */}
+                    <div className="grid grid-cols-4 gap-3">
+                      {/* Ligne 1 : Principales */}
+                      <StatBox label="PTS" value={recentFormAvg.PTS} color="text-primary" />
+                      <StatBox label="REB" value={recentFormAvg.REB} color="text-blue-600" />
+                      <StatBox label="AST" value={recentFormAvg.AST} color="text-emerald-600" />
+                      
+                      {/* PRA Mis en valeur */}
+                      <div className="bg-purple-50 p-2 rounded-lg border border-purple-200 text-center flex flex-col justify-center">
+                        <span className="text-[10px] font-bold text-purple-700">PRA</span>
+                        <span className="text-xl font-black text-purple-900">
+                          {recentFormAvg.PRA?.toFixed(1) || "-"}
+                        </span>
+                      </div>
+
+                      {/* Ligne 2 : Combos & Défense */}
+                      <MiniStatBox label="Pts+Ast" value={recentFormAvg.PA} />
+                      <MiniStatBox label="Pts+Reb" value={recentFormAvg.PR} />
+                      <StatBox label="STL" value={recentFormAvg.STL} color="text-orange-600" />
+                      <StatBox label="BLK" value={recentFormAvg.BLK} color="text-gray-600" />
+                    </div>
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Aucune donnée disponible
+                  <div className="text-center py-8 text-muted-foreground bg-muted/20 rounded">
+                    Aucune donnée récente disponible
                   </div>
                 )}
               </TabsContent>
 
-              {/* H2H Tab */}
-              <TabsContent value="h2h" className="space-y-4">
+              {/* --- ONGLETS 2 : H2H --- */}
+              <TabsContent value="h2h" className="space-y-4 pt-4">
                 {historyLoading ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                   </div>
                 ) : h2hAverage && h2hAverage.GP > 0 ? (
                   <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground font-medium">
-                      Moyenne sur les {h2hAverage.GP} derniers matchs
-                    </p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {/* PTS */}
-                      <div className="bg-primary/10 p-3 rounded-lg border border-primary/20 text-center">
-                        <p className="text-xs text-muted-foreground font-semibold mb-1">PTS</p>
-                        <p className="text-2xl font-bold text-primary">
-                          {h2hAverage.PTS?.toFixed(1) || "0.0"}
-                        </p>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Trophy className="h-4 w-4 text-amber-500" />
+                      <p className="text-sm text-muted-foreground font-medium">
+                        Moyenne vs {opponentTeamName} ({h2hAverage.GP} matchs)
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-3">
+                      {/* Ligne 1 : Principales */}
+                      <StatBox label="PTS" value={h2hAverage.PTS} />
+                      <StatBox label="REB" value={h2hAverage.REB} color="text-blue-600" />
+                      <StatBox label="AST" value={h2hAverage.AST} color="text-emerald-600" />
+                      
+                      {/* PRA Mis en valeur */}
+                      <div className="bg-amber-50 p-2 rounded-lg border border-amber-200 text-center flex flex-col justify-center">
+                        <span className="text-[10px] font-bold text-amber-700">PRA</span>
+                        <span className="text-xl font-black text-amber-900">
+                          {h2hAverage.PRA?.toFixed(1) || "-"}
+                        </span>
                       </div>
 
-                      {/* REB */}
-                      <div className="bg-blue-500/10 p-3 rounded-lg border border-blue-500/20 text-center">
-                        <p className="text-xs text-muted-foreground font-semibold mb-1">REB</p>
-                        <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                          {h2hAverage.REB?.toFixed(1) || "0.0"}
-                        </p>
-                      </div>
-
-                      {/* AST */}
-                      <div className="bg-emerald-500/10 p-3 rounded-lg border border-emerald-500/20 text-center">
-                        <p className="text-xs text-muted-foreground font-semibold mb-1">AST</p>
-                        <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-                          {h2hAverage.AST?.toFixed(1) || "0.0"}
-                        </p>
-                      </div>
-
-                      {/* PRA - Highlighted */}
-                      <div className="bg-amber-500/20 p-3 rounded-lg border-2 border-amber-500/40 text-center">
-                        <p className="text-xs font-bold text-amber-700 dark:text-amber-300 mb-1">PRA</p>
-                        <p className="text-2xl font-bold text-amber-900 dark:text-amber-200">
-                          {h2hAverage.PRA?.toFixed(1) || "0.0"}
-                        </p>
-                      </div>
-
-                      {/* PA */}
-                      <div className="bg-cyan-500/10 p-3 rounded-lg border border-cyan-500/20 text-center">
-                        <p className="text-xs text-muted-foreground font-semibold mb-1">PA</p>
-                        <p className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
-                          {h2hAverage.PA?.toFixed(1) || "0.0"}
-                        </p>
-                      </div>
-
-                      {/* PR */}
-                      <div className="bg-orange-500/10 p-3 rounded-lg border border-orange-500/20 text-center">
-                        <p className="text-xs text-muted-foreground font-semibold mb-1">PR</p>
-                        <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                          {h2hAverage.PR?.toFixed(1) || "0.0"}
-                        </p>
-                      </div>
-
-                      {/* AR */}
-                      <div className="bg-pink-500/10 p-3 rounded-lg border border-pink-500/20 text-center">
-                        <p className="text-xs text-muted-foreground font-semibold mb-1">AR</p>
-                        <p className="text-2xl font-bold text-pink-600 dark:text-pink-400">
-                          {h2hAverage.AR?.toFixed(1) || "0.0"}
-                        </p>
-                      </div>
+                      {/* Ligne 2 : Combos & Défense */}
+                      <MiniStatBox label="Pts+Ast" value={h2hAverage.PA} />
+                      <MiniStatBox label="Pts+Reb" value={h2hAverage.PR} />
+                      <StatBox label="STL" value={h2hAverage.STL} color="text-orange-600" />
+                      <StatBox label="BLK" value={h2hAverage.BLK} color="text-gray-600" />
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-muted-foreground">
+                  <div className="text-center py-8 text-muted-foreground bg-muted/20 rounded">
                     Aucun historique récent contre cette équipe
                   </div>
                 )}
@@ -309,16 +258,13 @@ export function PlayerDetailsModal({
           <div className="border-t pt-6">
             <h3 className="text-sm font-semibold text-muted-foreground mb-4 flex items-center gap-2">
               <Flame className="h-4 w-4 text-orange-500" />
-              EST-CE QUE ÇA PASSE ?
+              SIMULATEUR DE PARI
             </h3>
 
             <div className="space-y-4">
-              {/* Stat Selector and Line Input */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-muted-foreground">
-                    Stat
-                  </label>
+                  <label className="text-xs font-medium text-muted-foreground">Statistique</label>
                   <Select value={selectedStat} onValueChange={handleStatChange}>
                     <SelectTrigger className="h-10">
                       <SelectValue />
@@ -327,14 +273,12 @@ export function PlayerDetailsModal({
                       <SelectItem value="PTS">Points (PTS)</SelectItem>
                       <SelectItem value="REB">Rebounds (REB)</SelectItem>
                       <SelectItem value="AST">Assists (AST)</SelectItem>
-                      <SelectItem value="PRA">PTS+REB+AST (PRA)</SelectItem>
+                      <SelectItem value="PRA">PRA (Pts+Reb+Ast)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-muted-foreground">
-                    Ligne du Bookmaker
-                  </label>
+                  <label className="text-xs font-medium text-muted-foreground">Ligne Bookmaker</label>
                   <Input
                     type="number"
                     placeholder="Ex: 22.5"
@@ -346,82 +290,43 @@ export function PlayerDetailsModal({
                 </div>
               </div>
 
-              {/* Projection Display */}
-              <div className="bg-secondary/30 rounded-lg p-4">
-                <div className="flex items-baseline justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">
-                      Notre Algo
-                    </p>
-                    <p className="text-2xl font-bold text-primary">
-                      {projection.toFixed(1)}
+              <div className="bg-secondary/30 rounded-lg p-4 flex justify-between items-center">
+                <div>
+                  <p className="text-xs text-muted-foreground">Notre Projection</p>
+                  <p className="text-2xl font-bold text-primary">{projection.toFixed(1)}</p>
+                </div>
+                {bookmakerLine && (
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">Écart</p>
+                    <p className={`text-lg font-bold ${
+                      (projection - parseFloat(bookmakerLine)) > 0 ? "text-emerald-600" : "text-red-600"
+                    }`}>
+                      {(projection - parseFloat(bookmakerLine)) > 0 ? "+" : ""}
+                      {(projection - parseFloat(bookmakerLine)).toFixed(1)}
                     </p>
                   </div>
-                  {bookmakerLine && (
-                    <div className="text-right">
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Écart
-                      </p>
-                      <p
-                        className={`text-lg font-bold ${
-                          parseFloat(bookmakerLine) > 0
-                            ? projection > parseFloat(bookmakerLine)
-                              ? "text-emerald-600"
-                              : "text-red-600"
-                            : ""
-                        }`}
-                      >
-                        {parseFloat(bookmakerLine) > 0
-                          ? (projection - parseFloat(bookmakerLine)).toFixed(1)
-                          : "-"}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
 
-              {/* Analyze Button */}
               <Button
                 onClick={handleAnalyze}
                 disabled={!bookmakerLine || parseFloat(bookmakerLine) <= 0}
-                className="w-full h-10"
+                className="w-full"
                 size="lg"
               >
-                Analyser
+                Calculer la Probabilité
               </Button>
 
-              {/* Calculator Results */}
               {calculatorOpen && calculatorResult && (
-                <div className="space-y-4 mt-4 pt-4 border-t">
+                <div className="space-y-4 mt-4 pt-4 border-t animate-in fade-in slide-in-from-top-2">
                   <Card className={getRecommendationColor(calculatorResult.recommendation)}>
                     <CardContent className="pt-6">
-                      <div className="space-y-4">
-                        {/* Probability Bar */}
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <p className="text-xs font-semibold text-muted-foreground">
-                              PROBABILITÉ
-                            </p>
-                            <p className="text-lg font-bold">
-                              {(calculatorResult.probability * 100).toFixed(0)}%
-                            </p>
-                          </div>
-                          <Progress
-                            value={calculatorResult.probability * 100}
-                            className="h-2"
-                          />
-                        </div>
-
-                        {/* Recommendation */}
-                        <div className="text-center py-2">
-                          <p className="text-lg font-bold uppercase">
-                            {calculatorResult.recommendation}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Confiance: {calculatorResult.confidence}
-                          </p>
-                        </div>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-bold uppercase">{calculatorResult.recommendation}</span>
+                        <span className="text-2xl font-bold">{(calculatorResult.probability * 100).toFixed(0)}%</span>
                       </div>
+                      <Progress value={calculatorResult.probability * 100} className="h-2 bg-black/10" />
+                      <p className="text-xs text-center mt-2 opacity-80">Indice de Confiance: {calculatorResult.confidence}</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -431,5 +336,29 @@ export function PlayerDetailsModal({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+// --- Petits composants pour le style ---
+
+function StatBox({ label, value, color = "text-foreground" }: { label: string, value: number | undefined, color?: string }) {
+  return (
+    <div className="bg-background border rounded-lg p-2 text-center">
+      <p className="text-[10px] text-muted-foreground font-semibold uppercase">{label}</p>
+      <p className={`text-lg font-bold ${color}`}>
+        {value?.toFixed(1) || "-"}
+      </p>
+    </div>
+  );
+}
+
+function MiniStatBox({ label, value }: { label: string, value: number | undefined }) {
+  return (
+    <div className="bg-muted/30 border rounded p-2 text-center">
+      <p className="text-[10px] text-muted-foreground">{label}</p>
+      <p className="text-lg font-semibold text-foreground">
+        {value?.toFixed(1) || "-"}
+      </p>
+    </div>
   );
 }
