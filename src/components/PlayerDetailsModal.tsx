@@ -114,6 +114,22 @@ export function PlayerDetailsModal({
     return historyData?.h2h_avg || null;
   }, [historyData]);
 
+  // Blowout Risk Logic
+  const blowoutRiskLevel = player.blowout_analysis?.risk_level || "LOW";
+  let blowoutStatusColor = "bg-green-500";
+  let blowoutStatusText = "Safe / Close Game";
+  let blowoutStatusIcon = <ShieldCheck className="h-5 w-5 text-green-600" />;
+
+  if (blowoutRiskLevel === "MEDIUM") {
+    blowoutStatusColor = "bg-yellow-500";
+    blowoutStatusText = "Blowout Risk";
+    blowoutStatusIcon = <AlertTriangle className="h-5 w-5 text-yellow-600" />;
+  } else if (blowoutRiskLevel === "HIGH") {
+    blowoutStatusColor = "bg-red-600 animate-pulse";
+    blowoutStatusText = "Extreme Danger";
+    blowoutStatusIcon = <Skull className="h-5 w-5 text-red-600" />;
+  }
+
   const getRecommendationColor = (recommendation: string): string => {
     const upper = recommendation.toUpperCase();
     if (upper.includes("OVER")) return "bg-emerald-500/20 border-emerald-500/30 text-emerald-600";
