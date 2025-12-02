@@ -139,8 +139,9 @@ export function MatchPredictionModal({
     [awayMissingPlayers]
   );
 
-  const getConfidenceBadgeColor = (confidence: string) => {
-    const lower = confidence.toLowerCase();
+  const getConfidenceBadgeColor = (level: string | undefined | null) => {
+    if (!level) return "bg-gray-500 text-white border-gray-600";
+    const lower = level.toLowerCase();
     if (lower.includes("indécis") || lower.includes("tight") || lower.includes("serré"))
       return "bg-amber-500/20 text-amber-700 border-amber-500/30";
     if (lower.includes("solid") || lower.includes("solide"))
@@ -300,10 +301,10 @@ export function MatchPredictionModal({
                     </span>
                     <Badge
                       className={`text-xs px-2 py-1 w-fit ${getConfidenceBadgeColor(
-                        prediction.confidence_level
+                        prediction?.confidence_level
                       )}`}
                     >
-                      {prediction.confidence_level}
+                      {prediction?.confidence_level}
                     </Badge>
                   </div>
                 </Card>
