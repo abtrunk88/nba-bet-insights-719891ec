@@ -20,7 +20,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp, Flame, CalendarDays, Trophy } from "lucide-react";
+import { TrendingUp, Flame, CalendarDays, Trophy, Loader2 } from "lucide-react";
 
 interface PlayerDetailsModalProps {
   isOpen: boolean;
@@ -60,7 +60,7 @@ export function PlayerDetailsModal({
     enabled: isOpen,
   });
 
-  const { data: calculatorResult, refetch: analyzeCalculator } = useQuery({
+  const { data: calculatorResult, refetch: analyzeCalculator, isFetching: isCalculating } = useQuery({
     queryKey: [
       "calculator-analysis",
       player.player_id,
@@ -77,10 +77,10 @@ export function PlayerDetailsModal({
     enabled: false,
   });
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (bookmakerLine && parseFloat(bookmakerLine) > 0) {
-      analyzeCalculator();
       setCalculatorOpen(true);
+      await analyzeCalculator();
     }
   };
 
