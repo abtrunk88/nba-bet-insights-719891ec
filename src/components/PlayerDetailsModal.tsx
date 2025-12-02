@@ -310,11 +310,18 @@ export function PlayerDetailsModal({
 
               <Button
                 onClick={handleAnalyze}
-                disabled={!bookmakerLine || parseFloat(bookmakerLine) <= 0}
+                disabled={!bookmakerLine || parseFloat(bookmakerLine) <= 0 || isCalculating}
                 className="w-full"
                 size="lg"
               >
-                Calculer la Probabilité
+                {isCalculating ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Analyse en cours...
+                  </div>
+                ) : (
+                  "Calculer la Probabilité"
+                )}
               </Button>
 
               {calculatorOpen && calculatorResult && (
