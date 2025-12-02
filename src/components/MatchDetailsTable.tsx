@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PlayerFullPrediction } from "@/services/nbaApi";
@@ -9,14 +10,34 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getReasoningStyle } from "@/lib/utils";
+import { PlayerPopupModal } from "./PlayerPopupModal";
+import { getTeamCode } from "@/lib/teamMapping";
 
 interface MatchDetailsTableProps {
   teamName: string;
   players: PlayerFullPrediction[];
   isHomeTeam?: boolean;
+  opponentTeamName?: string;
 }
 
-export function MatchDetailsTable({ teamName, players, isHomeTeam = false }: MatchDetailsTableProps) {
+interface SelectedPlayer {
+  id: number;
+  name: string;
+}
+
+export function MatchDetailsTable({ teamName, players, isHomeTeam = false, opponentTeamName = "" }: MatchDetailsTableProps) {
+  const [selectedPlayer, setSelectedPlayer] = useState<SelectedPlayer | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handlePlayerClick = (player: PlayerFullPrediction) => {
+    setSelectedPlayer({
+      id: player.player_id,
+      name: player.player,
+    });
+    setIsModalOpen(true);
+  };
+
+  const opponentTeamId = opponentTeamName ? getTeamCode(opponentTeamName) : "";
   const sortedPlayers = [...players].sort((a, b) => {
     const aPts = a.predicted_stats.PTS || 0;
     const bPts = b.predicted_stats.PTS || 0;
